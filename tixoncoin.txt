@@ -1,0 +1,7 @@
+Tixon Node RPC UR：http://rpc.tixoncoin.com
+
+Tixon chain ID:5888
+
+Tixon Blockchain Browser：http://explorer.tixoncoin.com/ 
+
+Tixon mapping：https://tsh.tixoncoin.com/#/

@@ -1,0 +1,295 @@
+//版权所有（c）2010中本聪
+//版权所有（c）2009-2014比特币开发人员
+//版权所有（c）2014-2015 The Dash开发人员
+//版权所有（c）2015-2017 PIVX开发人员
+//版权所有（c）2017-2018 Tixoncash开发人员
+//版权所有（c）2018-2020 Tixonshare开发人员
+//版权所有（c）2021 TSH-TCH开发人员
+//版权所有（c）2021-2024-TCP tixoncoin（TIX）开发人员
+//根据MIT软件许可分发，请参阅随附的
+
+
+
+// tixoncoin公链DNS播种
+
+vSeeds。push_back（CDNSSeedData（“ 38.60.223.13 ”，“ 38.60.223.13 ”））;
+vSeeds。push_back（CDNSSeedData（“ 38.60.223.75 ”，“ 38.60.223.75 ”））;
+vSeeds。push_back（CDNSSeedData（“ 38.60.223.88 ”，“ 38.60.223.88 ”））;
+vSeeds。push_back（CDNSSeedData（“ 38.54.17.91”，“    38.54.17.91 ”））;
+vSeeds。push_back（CDNSSeedData（“ 38.54.50.16 ”，“    38.54.50.16  ”））;
+vSeeds。push_back（CDNSSeedData（“ 168.62.196.58 ”，“ 168.62.196.58 ”vSeeds。push_back（CDNSSeedData（“ 198.58.208.13 ”，“ 198.58.208.13 ”））;
+vSeeds。push_back（CDNSSeedData（“ 55.65.213.13 ”，“   55.65.213.13 ”））;
+vSeeds。push_back（CDNSSeedData（“ 38.22.235.18”，“    38.22.235.18 ”））;
+vSeeds。push_back（CDNSSeedData（“ 128.199.61.189 ”，“ 128.199.61.189 ”））;
+vSeeds。push_back（CDNSSeedData（“ 188.166.96.226 ”，“ 188.166.96.226 ”））;
+vSeeds。push_back（CDNSSeedData（“ 188.166.120.17 ”，“ 188.166.120.17 ”））;
+vSeeds。push_back（CDNSSeedData（“ 188.166.127.127 ”，“ 188.166.127.127 ”））;
+vSeeds。push_back（CDNSSeedData（“ 128.199.48.70 ”，“ 128.199.48.70 ”））;
+vSeeds。push_back（CDNSSeedData（“ 178.62.196.147 ”，“ 178.62.196.147 ”））;
+vSeeds。push_back（CDNSSeedData（“ 178.62.232.19 ”，“ 178.62.232.19 ”））;
+vSeeds。push_back（CDNSSeedData（“ 128.199.45.156 ”，“ 128.199.45.156 ”））;
+vSeeds。push_back（CDNSSeedData（“ 188.166.50.176 ”，“ 188.166.50.176 ”））;
+
+
+tixoncoin 公链部分数据代码 C++语言
+
+#include <iostream>
+#include <web3cpp/web3.h>
+#include <web3cpp/contract.h>
+#include <web3cpp/account.h>
+
+int main() {
+    // 初始化Web3实例，连接到Tixon RPC节点
+    std::string rpcUrl = "http://rpc.tixoncoin.com";
+    Web3 web3(rpcUrl);
+
+    try {
+        // 获取链ID并输出
+        std::string chainId = web3.net_version();
+        std::cout << "Connected to Tixon network with Chain ID: " << chainId << std::endl;
+
+        // 检查是否连接到了正确的链
+        if (chainId != "5888") {
+            std::cerr << "Error: Connected to the wrong chain. Expected Chain ID: 5888" << std::endl;
+            return 1;
+        }
+
+        // 获取最新区块号
+        std::string latestBlockNumberHex = web3.eth_blockNumber();
+        uint64_t latestBlockNumber = web3.utils_hexToDec(latestBlockNumberHex);
+        std::cout << "Latest block number: " << latestBlockNumber << std::endl;
+
+        // 获取最新区块信息
+        Json::Value latestBlock = web3.eth_getBlockByNumber(latestBlockNumberHex, true);
+
+        // 输出区块信息
+        std::cout << "Block Hash: " << latestBlock["hash"].asString() << std::endl;
+        std::cout << "Parent Hash: " << latestBlock["parentHash"].asString() << std::endl;
+        std::cout << "Timestamp: " << latestBlock["timestamp"].asString() << std::endl;
+        std::cout << "Transactions: " << latestBlock["transactions"].size() << std::endl;
+
+        // 获取账户余额
+       std::string balanceHex = web3.eth_getBalance(accountAddress);
+        uint64_t balance = web3.utils_hexToDec(balanceHex);
+        std::cout << "Balance of account " << accountAddress << ": " << balance << " TIX" << std::endl;
+
+        // 释放TIX合约地址和映射合约地址
+        std::string tixClaimContractAddress = "0xA84FA2AA1bB0612D9aaB260bFb421A804CAaC4f5";
+        std::string crossChainContractAddress = "0x6D5922313789b35999c0640a7F1Cc76794eEFE20";
+
+        
+        // 黑洞地址，用于销毁代币
+        std::string burnAddress = "0x000000000000000000000000000000000000dEaD";
+
+        // 1. 调用映射功能
+        uint64_t amountToStake = 1000000000000000000; // 1 TIX in wei
+        Contract stakingContract(web3, stakingContractAddress);
+        Json::Value stakeMethod;
+        stakeMethod["from"] = accountAddress;
+        stakeMethod["to"] = stakingContractAddress;
+        stakeMethod["gas"] = "0x5208"; // 21000 Gas
+
+        std::string stakeMethodSignature = "stake(uint256,uint256)";
+        std::vector<std::string> stakeParams = {
+            web3.utils_decToHex(amountToStake),  //映射数量
+            web3.utils_decToHex(365) // 映射天数
+        };
+        std::string stakeTxData = stakingContract.CallEncodedFunction(stakeMethodSignature, stakeParams);
+
+        stakeMethod["data"] = stakeTxData;
+
+        // 签署并发送映射交易
+        std::string privateKey = "0xYourPrivateKeyHere"; 
+        std::string signedStakeTx = web3.eth_signTransaction(stakeMethod, privateKey);
+        std::string stakeTxHash = web3.eth_sendRawTransaction(signedStakeTx);
+
+        std::cout << "Stake transaction sent! Tx Hash: " << stakeTxHash << std::endl;
+
+        // 2. 提取映射收益功能
+        uint64_t rewardsPercentage = 50; // 50% 收益
+        uint64_t feePercentage = 20; // 20% 手续费
+
+        // 计算映射到期后的总收益
+        uint64_t stakingRewards = (amountToStake * rewardsPercentage) / 100;
+        uint64_t totalAmount = amountToStake + stakingRewards;
+
+        // 计算手续费
+        uint64_t feeAmount = (totalAmount * feePercentage) / 100;
+        uint64_t amountAfterFee = totalAmount - feeAmount;
+
+        // 构建提取映射交易
+        Json::Value unstakeMethod;
+        unstakeMethod["from"] = accountAddress;
+        unstakeMethod["to"] = stakingContractAddress;
+        unstakeMethod["gas"] = "0x5208"; // 21000 Gas
+
+        std::string unstakeMethodSignature = "unstake()"; // 假设提取质押的方法为unstake()
+        std::string unstakeTxData = stakingContract.CallEncodedFunction(unstakeMethodSignature);
+
+        unstakeMethod["data"] = unstakeTxData;
+
+        // 签署并发送提取映射交易
+        std::string signedUnstakeTx = web3.
+
+
+
+eth_signTransaction(unstakeMethod, privateKey);
+        std::string unstakeTxHash = web3.eth_sendRawTransaction(signedUnstakeTx);
+
+        std::cout << "Unstake transaction sent! Tx Hash: " << unstakeTxHash << std::endl;
+
+        // 3. 手续费销毁
+        Json::Value burnMethod;
+        burnMethod["from"] = accountAddress;
+        burnMethod["to"] = burnAddress;
+        burnMethod["value"] = web3.utils_decToHex(feeAmount); // 销毁的数量
+        burnMethod["gas"] = "0x5208"; // 21000 Gas
+
+        // 签署并发送销毁交易
+        std::string signedBurnTx = web3.eth_signTransaction(burnMethod, privateKey);
+        std::string burnTxHash = web3.eth_sendRawTransaction(signedBurnTx);
+
+        std::cout << "Burn transaction sent! Tx Hash: " << burnTxHash << std::endl;
+
+        // 4. 获取映射和提取映射后的账户余额
+        std::string newBalanceHex = web3.eth_getBalance(accountAddress);
+        uint64_t newBalance = web3.utils_hexToDec(newBalanceHex);
+        std::cout << "New balance of account " << accountAddress << ": " << newBalance << " TIX" << std::endl;
+
+    } catch (const std::exception& e) {
+        std::cerr << "An error occurred: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
+
+tixoncoin 公链数据整理
+
+Tixon网络名称：tixoncoin
+
+Tixon节点 RPC UR： http://rpc.tixoncoin.com
+
+Tixon chain ID:5888
+
+Tixon 原生币符号：TIX
+
+Tixon区块链浏览器: http://explorer.tixoncoin.com/ 
+
+Tixon映射DAPP：https://tsh.tixoncoin.com/#/
+
+
+tixoncoin 多币种钱包部分代码（公链上线60日内下放）
+
+#include <iostream>
+#include <vector>
+#include <map>
+#include <string>
+#include <ctime>
+
+// 定义币种结构
+struct Currency {
+    std::string symbol; // 币种符号，如 "TIX"
+    std::string name;   // 币种名称，如 "Tixoncoin"
+    double balance;     // 账户余额
+};
+
+// 定义钱包类
+class TixoncoinWallet {
+private:
+    std::string walletName;
+    std::string walletAddress;
+    std::map<std::string, Currency> currencies;
+    time_t creationTime;
+
+public:
+    // 构造函数
+    TixoncoinWallet(std::string name) {
+        walletName = name;
+        walletAddress = generateWalletAddress();
+        creationTime = std::time(nullptr);
+    }
+
+    // 生成钱包地址
+    std::string generateWalletAddress() {
+        // 简化的地址生成逻辑，以"G"开头
+        return "G" + std::to_string(std::rand() % 1000000000);
+    }
+
+    // 添加币种
+    void addCurrency(std::string symbol, std::string name, double initialBalance = 0.0) {
+        Currency newCurrency = { symbol, name, initialBalance };
+        currencies[symbol] = newCurrency;
+    }
+
+    // 更新余额
+    void updateBalance(std::string symbol, double amount) {
+        if (currencies.find(symbol) != currencies.end()) {
+            currencies[symbol].balance += amount;
+        } else {
+            std::cerr << "Currency not found!" << std::endl;
+        }
+    }
+
+    // 获取余额
+    double getBalance(std::string symbol) {
+        if (currencies.find(symbol) != currencies.end()) {
+            return currencies[symbol].balance;
+        } else {
+            std::cerr << "Currency not found!" << std::endl;
+            return 0.0;
+        }
+    }
+
+    // 显示钱包信息
+    void displayWalletInfo() {
+        std::cout << "Wallet Name: " << walletName << std::endl;
+        std::cout << "Wallet Address: " << walletAddress << std::endl;
+        std::cout << "Created At: " << std::ctime(&creationTime);
+        std::cout << "Currencies supported: " << std::endl;
+        for (const auto& currency : currencies) {
+            std::cout << "  " << currency.second.name << " (" << currency.second.symbol << ") - Balance: " << currency.second.balance << std::endl;
+        }
+    }
+
+    // 显示单一币种信息
+    void displayCurrencyInfo(std::string symbol) {
+        if (currencies.find(symbol) != currencies.end()) {
+            std::cout << currencies[symbol].name << " (" << symbol << ") - Balance: " << currencies[symbol].balance << std::endl;
+        } else {
+            std::cerr << "Currency not found!" << std::endl;
+        }
+    }
+};
+
+int main() {
+    // 创建钱包
+    TixoncoinWallet myWallet("Tixoncoin");
+
+    // 添加多个币种
+    myWallet.addCurrency("TIX", "Tixoncoin", 1000.0);
+    myWallet.addCurrency("BTC", "Bitcoin", 0.5);
+    myWallet.addCurrency("ETH", "Ethereum", 10.0);
+
+    // 显示钱包信息
+    myWallet.displayWalletInfo();
+
+    // 更新Tixoncoin余额
+    myWallet.updateBalance("TIX", 500.0);
+
+    // 显示单一币种信息
+    myWallet.displayCurrencyInfo("TIX");
+
+    // 更新Bitcoin余额
+    myWallet.updateBalance("BTC", 0.1);
+
+    // 显示Bitcoin信息
+    myWallet.displayCurrencyInfo("BTC");
+
+    // 模拟发送Tixoncoin
+    std::cout << "Sending 300 TIX..." << std::endl;
+    myWallet.updateBalance("TIX", -300.0);
+    myWallet.displayCurrencyInfo("TIX");
+
+    return 0;
+}
