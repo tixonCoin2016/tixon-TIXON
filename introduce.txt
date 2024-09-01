@@ -2,7 +2,7 @@ After going through a long and difficult journey, tixon finally successfully lau
 
 Tixon has overcome countless difficulties and challenges, and now a large number of ecosystems and technologies have been successfully developed. The planning steps and dates for each application are announced as follows:
 
-1. The Tixon public chain is officially launched, and TCP holders can map to the Tixon public chain for 90 days. The mapping contract will automatically stop at 1:2:3 Moscow time on November 22, 2024, and the mapping channel will be permanently closed after stopping;
+1. The Tixon public chain is officially launched, and TCP holders can map to the Tixon public chain for 90 days. The mapping contract will automatically stop at 1time:2divide:3second Moscow time on November 22, 2024, and the mapping channel will be permanently closed after stopping;
 
 2. Within 3 days after the launch of the Tixon public chain, Tixon nodes will be deployed, and participating nodes need to successfully map 1 million TCP;
 
